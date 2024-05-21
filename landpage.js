@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-    function updateURL(pageNumber) {
+    function updateURLAndLocalStorage(pageNumber) {
         const url = new URL(window.location);
         url.hash = `#page${pageNumber}`;
         history.pushState(null, '', url);
+        localStorage.setItem('currentPage', pageNumber);
     }
 
     const contentText = document.querySelector('.content-text');
@@ -70,81 +71,93 @@ document.addEventListener("DOMContentLoaded", function () {
                                 e outras tecnologias, uma maneira
                                 diversificada e gamificada de estudar!
                             </p>
-
                             <img src="imgs/Bin.svg" alt="">
                         </div>
                     `;
 
                     main2.innerHTML = `
-                    <div class="main2">
-                        <h2>Veja algumas tecnologias</h2>
-                        <div>
-                            <a class="tecnologias">
-                                <img src="imgs/botao-java.png" alt="">
-                            </a>
-                            <a class="tecnologias">
-                                <img src="imgs/botao-html.png" alt="">
-                            </a>
+                        <div class="main2">
+                            <h2>Veja algumas tecnologias</h2>
+                            <div>
+                                <a class="tecnologias">
+                                    <img src="imgs/botao-java.png" alt="">
+                                </a>
+                                <a class="tecnologias">
+                                    <img src="imgs/botao-html.png" alt="">
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
                 }
             });
         });
     }
 
+    function setActivePage(page) {
+        navLinks.forEach(navLink => navLink.classList.remove('active'));
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        const navLink = document.querySelector(`.nav-div2 a[href="#page${page}"]`);
+        if (navLink) {
+            navLink.classList.add('active');
+        }
+
+        const button = document.querySelector(`.page-button[data-page="${page}"]`);
+        if (button) {
+            button.classList.add('active');
+        }
+
+        const pageContent = pagesContent[page];
+        if (pageContent) {
+            updateContent(pageContent);
+        }
+
+        updateURLAndLocalStorage(page);
+
+        const homeButton = document.querySelector('.nav-div2 a[href="#Home"]');
+        if (page === '1') {
+            homeButton.classList.add('active');
+        } else {
+            homeButton.classList.remove('active');
+        }
+
+        const funcionalidadesButton = document.querySelector('.nav-div2 a[href="#Funcionalidades"]');
+        if (page === '2') {
+            funcionalidadesButton.classList.add('active');
+        } else {
+            funcionalidadesButton.classList.remove('active');
+        }
+    }
+
     buttons.forEach(button => {
         button.addEventListener('click', function () {
             const page = this.getAttribute('data-page');
-            navLinks.forEach(navLink => navLink.classList.remove('active'));
-            const navLink = document.querySelector(`.nav-div2 a[href="#page${page}"]`);
-            if (navLink) {
-                navLink.classList.add('active');
-            }
-
-            buttons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-
-            const pageContent = pagesContent[page];
-            if (pageContent) {
-                updateContent(pageContent);
-            }
-
-            updateURL(page);
-
-            const homeButton = document.querySelector('.nav-div2 a[href="#Home"]');
-            if (page === '1') {
-                homeButton.classList.add('active');
-            } else {
-                homeButton.classList.remove('active');
-            }
-
-            const funcionalidadesButton = document.querySelector('.nav-div2 a[href="#Funcionalidades"]');
-            if (page === '2') {
-                funcionalidadesButton.classList.add('active');
-            } else {
-                funcionalidadesButton.classList.remove('active');
-            }
+            setActivePage(page);
         });
     });
 
-    buttons[0].classList.add('active');
-    navLinks[0].classList.add('active');
+    const funcionalidadesButton = document.querySelector('.nav-div2 a[href="#Funcionalidades"]');
+    const page2Button = document.querySelector('.page-button[data-page="2"]');
 
-    addDynamicButtonEvents();
+    funcionalidadesButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        page2Button.click();
+    });
 
     navLinks.forEach(navLink => {
-        navLink.addEventListener('click', function () {
-            navLinks.forEach(link => link.classList.remove('active'));
-            this.classList.add('active');
-
-            const targetPage = this.getAttribute('href').replace('#', ''); // Obtém o ID da página do link clicado
-            if (targetPage === 'Home') {
-                document.querySelector('.page-button[data-page="1"]').click(); // Redireciona para a página 1
-            } else if (targetPage === 'Funcionalidades') {
-                document.querySelector('.page-button[data-page="2"]').click(); // Redireciona para a página 2
+        navLink.addEventListener('click', function (event) {
+            const href = this.getAttribute('href');
+            if (href === "#Home") {
+                setActivePage('1');
+            } else if (href === "#Funcionalidades") {
+                setActivePage('2');
+            } else {
+                navLinks.forEach(link => link.classList.remove('active'));
+                this.classList.add('active');
             }
         });
     });
 
+    const savedPage = localStorage.getItem('currentPage') || '1';
+    setActivePage(savedPage);
 });
