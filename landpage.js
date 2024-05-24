@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             text: "Inscreva-se para receber atualizações e mais detalhes da plataforma",
             buttons: [
                 { href: "#Inscreva-se", text: "Inscreva-se", class: "botao-branco" },
-                { href: "#InicieJa", text: "Inicie Já", class: "inicie-ja" }
+                { href: "https://binarying-bin-front.azuremicroservices.io/", text: "Inicie Já", class: "inicie-ja" }
             ]
         },
         2: {
